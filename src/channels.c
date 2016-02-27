@@ -2020,6 +2020,11 @@ SSH_PACKET_CALLBACK(ssh_request_denied){
   if(session->global_req_state != SSH_CHANNEL_REQ_STATE_PENDING){
     SSH_LOG(SSH_LOG_RARE, "SSH_REQUEST_DENIED received in incorrect state %d",
         session->global_req_state);
+
+    if (ssh_callbacks_exists(session->server_callbacks, client_request_denied_function)){
+      session->server_callbacks->client_request_denied_function(
+        session, session->server_callbacks->userdata);
+    }
   } else {
     session->global_req_state=SSH_CHANNEL_REQ_STATE_DENIED;
   }

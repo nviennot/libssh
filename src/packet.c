@@ -464,8 +464,7 @@ SSH_PACKET_CALLBACK(ssh_packet_unimplemented){
     uint32_t seq;
     int rc;
 
-    (void)session; /* unused */
-    (void)type;
+    (void)type; /* unused */
     (void)user;
 
     rc = ssh_buffer_unpack(packet, "d", &seq);
@@ -476,6 +475,11 @@ SSH_PACKET_CALLBACK(ssh_packet_unimplemented){
 
     SSH_LOG(SSH_LOG_RARE,
             "Received SSH_MSG_UNIMPLEMENTED (sequence number %d)",seq);
+
+    if (ssh_callbacks_exists(session->server_callbacks, client_unimplemented_packet_function)){
+      session->server_callbacks->client_unimplemented_packet_function(
+        session, seq, session->server_callbacks->userdata);
+    }
 
     return SSH_PACKET_USED;
 }
