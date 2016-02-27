@@ -296,6 +296,21 @@ typedef int (*ssh_gssapi_accept_sec_ctx_callback) (ssh_session session,
 typedef int (*ssh_gssapi_verify_mic_callback) (ssh_session session,
 		ssh_string mic, void *mic_buffer, size_t mic_buffer_size, void *userdata);
 
+/**
+ * @brief Handle a notification from the client that it received an unimplemented packet.
+ * @param session current session handler
+ * @param seq packet sequence number
+ * @param userdata Userdata to be passed to the callback function.
+ */
+typedef void (*ssh_client_unimplemented_packet_callback) (ssh_session session, uint32_t seq, void *userdata);
+
+/**
+ * @brief Handle an unhandled client request denied callback.
+ * @param session current session handler
+ * @param userdata Userdata to be passed to the callback function.
+ */
+typedef void (*ssh_client_request_denied_callback) (ssh_session session, void *userdata);
+
 
 /**
  * This structure can be used to implement a libssh server, with appropriate callbacks.
@@ -345,6 +360,16 @@ struct ssh_server_callbacks_struct {
   /* This function will be called when a MIC needs to be verified.
    */
   ssh_gssapi_verify_mic_callback gssapi_verify_mic_function;
+
+  /** This function will be called when the client notifies the server of an
+   * unimplemented packet.
+   */
+  ssh_client_unimplemented_packet_callback client_unimplemented_packet_function;
+
+  /** This function will be called when the client notifies the server of an
+   * non handled deny of request.
+   */
+  ssh_client_request_denied_callback client_request_denied_function;
 };
 typedef struct ssh_server_callbacks_struct *ssh_server_callbacks;
 
